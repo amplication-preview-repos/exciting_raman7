@@ -1,0 +1,115 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model MigrationFlow {
+  createdAt          DateTime   @default(now())
+  date               DateTime?
+  destinationCountry String?
+  id                 String     @id @default(auto()) @map("_id") @db.ObjectId
+  migrantsItems      Migrants[]
+  numberOfMigrants   Int?
+  originCountry      String?
+  updatedAt          DateTime   @updatedAt
+}
+
+model Country {
+  code            String?
+  createdAt       DateTime         @default(now())
+  departurePoints DeparturePoint[]
+  entryPoints     EntryPoint[]
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  name            String?
+  population      Int?
+  regions         Region[]
+  updatedAt       DateTime         @updatedAt
+}
+
+model Region {
+  cities    City[]
+  country   Country? @relation(fields: [countryId], references: [id])
+  countryId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Migrants {
+  age             Int?
+  createdAt       DateTime       @default(now())
+  documentsItems  Documents[]
+  firstName       String?
+  gender          String?
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  lastName        String?
+  migrationFlow   MigrationFlow? @relation(fields: [migrationFlowId], references: [id])
+  migrationFlowId String?        @db.ObjectId
+  updatedAt       DateTime       @updatedAt
+}
+
+model City {
+  createdAt  DateTime @default(now())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  population Int?
+  region     Region?  @relation(fields: [regionId], references: [id])
+  regionId   String?  @db.ObjectId
+  updatedAt  DateTime @updatedAt
+}
+
+model Documents {
+  createdAt   DateTime  @default(now())
+  description String?
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  migrant     Migrants? @relation(fields: [migrantId], references: [id])
+  migrantId   String?   @db.ObjectId
+  typeField   String?
+  updatedAt   DateTime  @updatedAt
+}
+
+model EntryPoint {
+  country   Country? @relation(fields: [countryId], references: [id])
+  countryId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  location  String?
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+model DeparturePoint {
+  country   Country? @relation(fields: [countryId], references: [id])
+  countryId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  location  String?
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  createdAt DateTime @default(now())
+  email     String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  password  String?
+  updatedAt DateTime @updatedAt
+  username  String?
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
